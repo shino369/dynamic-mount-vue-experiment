@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router"
-import { computed } from "vue"
+import { computed, defineAsyncComponent } from "vue"
 import NavBar from "@/components/NavBar.vue"
 import { useSideBar } from "@/stores/sidebar"
 import ModalDialog from "./components/ModalDialog.vue";
+import { mountComp } from "./main";
+
+const comp = defineAsyncComponent(
+      () => import(`@/views/${mountComp.trim()}.vue`)
+    )
 
 const sideBarStore = useSideBar()
 const isSideBarShow = computed(() => sideBarStore.isSideBarShow)
+
 </script>
 
 <template>
@@ -21,6 +27,8 @@ const isSideBarShow = computed(() => sideBarStore.isSideBarShow)
       }"
     >
       <RouterView class="shadow-2xl p-4 md:rounded-br-[2rem] h-full bg-white" />
+
+       <component :is="comp" />
     </div>
 
     <ModalDialog />

@@ -11,7 +11,7 @@ import type { FileObj } from "@/types"
 import _ from "lodash"
 import { onMounted, ref, shallowRef, computed, onUnmounted } from "vue"
 import { onBeforeRouteUpdate, useRoute } from "vue-router"
-import { rehydrate } from "@/main"
+// import { rehydrate } from "@/main"
 import type { Subscription } from "rxjs"
 
 /* ****************state***************** */
@@ -36,24 +36,24 @@ const folderStore = useFolderStore()
 const { setLoading } = useLoading()
 const loadingStore = useLoading()
 
-const sortBy = computed(() => folderStore.sortBy)
-const orderBy = computed(() => folderStore.orderBy)
+// const sortBy = computed(() => folderStore.sortBy)
+// const orderBy = computed(() => folderStore.orderBy)
 let subscribeRehydrate: Subscription
 
 onMounted(() => {
-  setLoading(true)
-  if (!rehydrate.getValue()) {
-    // using custom async store cause delay in mounting.
-    // here use rxjs to observe if ready.
-    subscribeRehydrate = rehydrate.subscribe((ready) => {
-      if (ready) {
+  // setLoading(true)
+  // if (!rehydrate.getValue()) {
+  //   // using custom async store cause delay in mounting.
+  //   // here use rxjs to observe if ready.
+  //   subscribeRehydrate = rehydrate.subscribe((ready) => {
+  //     if (ready) {
    
-        init(route.params.name as string)
-      }
-    })
-  } else {
+  //       init(route.params.name as string)
+  //     }
+  //   })
+  // } else {
     init(route.params.name as string)
-  }
+  // }
 })
 
 onUnmounted(() => {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from "vue"
 import ModalDialog from "./components/ModalDialog.vue"
-import { mountComp } from "./main"
+import { phpProps } from "./main"
 
 const comp = defineAsyncComponent(
-  () => import(`@/views/${mountComp.trim()}.vue`)
+  () => import(`@/views/${phpProps.view.trim()}.vue`)
 )
 </script>
 

@@ -1,11 +1,3 @@
-export interface FileObj {
-  url?: string
-  file: File
-}
-
-export interface Folder {
-  [key: string]: FileObj[]
-}
 
 export interface ActionBtn {
   name: string
@@ -16,7 +8,7 @@ export interface ActionBtn {
 
 export interface ModalDetail {
   inputValue?: string
-  onInputChange?(e: Event): void
+  onInputChange?(_e: Event): void
   header?: string
   headerClass?: string
   content: any
@@ -32,9 +24,6 @@ export interface ModalObject {
   type: "modal" | "popup"
   onClose(): void // action will fire after close()
 }
-
-export type SortType = "lastModified" | "name" | "size"
-export type OrderType = "desc" | "asc"
 
 export interface MemAttributeRequest {
   [key:string]: any
@@ -59,4 +48,42 @@ export interface ExtraTypes<T> {
   type: string
   id: string | number
   options: Option<T>[]
+}
+
+export interface OptionVal {
+  type: string
+  value: string
+}
+
+export interface ExtraTypePropsData {
+  data: {
+     langKey:     string
+     outletId:    string
+     baseUrl:     string
+     id:          string
+     seq:         string
+     type:        string
+     show:        boolean
+     required:    boolean
+     validations: []
+     name_l1:     string
+     name_l2:     string
+     name_l3:     string
+     name_l4:     string
+     name_l5:     string
+     childType:   string
+     params:      {
+       mem_attribute_types:  OptionVal
+       terms_n_services_enable: OptionVal
+       terms_n_services_options: OptionVal
+     }
+   }
+  t: (_str:string) => string
+}
+
+export interface PhpProps<T = any> {
+  data: any | T
+  translation: Record<string, string>
+  view: string
+  uniqSelector: string
 }

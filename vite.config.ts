@@ -17,10 +17,10 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),
-      name: "entrypoint",
+      name: "entry",
       // the proper extensions will be added
-      fileName: "entrypoint",
-      formats: ["es", "umd"],
+      fileName: "entry",
+      formats: ["umd"],
     },
     rollupOptions: {
       // external: ['vue', 'lodash', 'moment', 'rxjs', 'localforage', 'vue-router']

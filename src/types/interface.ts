@@ -35,3 +35,28 @@ export interface ModalObject {
 
 export type SortType = "lastModified" | "name" | "size"
 export type OrderType = "desc" | "asc"
+
+export interface MemAttributeRequest {
+  [key:string]: any
+}
+
+export interface MemAttributeResponse {
+  memAttributeTypes: {
+    [key:string]: any
+    MemAttributeOption: Record<string, any>[]
+  }[]
+  tnc: {
+    TmsExtraType: any
+  }[]
+}
+
+export interface Option<T> {
+  label: string
+  value: T
+}
+
+export interface ExtraTypes<T> {
+  type: string
+  id: string | number
+  options: Option<T>[]
+}

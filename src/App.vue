@@ -1,38 +1,16 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router"
-import { computed, defineAsyncComponent } from "vue"
-import NavBar from "@/components/NavBar.vue"
-import { useSideBar } from "@/stores/sidebar"
-import ModalDialog from "./components/ModalDialog.vue";
-import { mountComp } from "./main";
+import { defineAsyncComponent } from "vue"
+import ModalDialog from "./components/ModalDialog.vue"
+import { mountComp } from "./main"
 
 const comp = defineAsyncComponent(
-      () => import(`@/views/${mountComp.trim()}.vue`)
-    )
-
-const sideBarStore = useSideBar()
-const isSideBarShow = computed(() => sideBarStore.isSideBarShow)
-
+  () => import(`@/views/${mountComp.trim()}.vue`)
+)
 </script>
 
 <template>
-  <div
-    class="main-container text-black select-none w-screen h-screen overflow-hidden md:px-4 text-base md:text-xl bg-slate-100"
-  >
-    <NavBar />
-    <div
-      class="router-wrapper md:pb-2 h-[calc(100%-4rem)] transition-transform"
-      :class="{
-        'translate-x-[20rem]': isSideBarShow,
-      }"
-    >
-      <RouterView class="shadow-2xl p-4 md:rounded-br-[2rem] h-full bg-white" />
-
-       <component :is="comp" />
-    </div>
-
-    <ModalDialog />
-  </div>
+  <component :is="comp" />
+  <ModalDialog />
 </template>
 
 <style scoped>

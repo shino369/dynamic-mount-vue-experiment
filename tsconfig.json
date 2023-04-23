@@ -12,9 +12,7 @@
       "dom.iterable",
       "es2022"
     ],
-    "types": [
-      "vue3-toastify/global"
-    ]
+    "ignoreDeprecations": "5.0"
   },
 
   "references": [

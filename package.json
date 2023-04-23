@@ -1,5 +1,5 @@
 {
-  "name": "vue-photo-hub-front",
+  "name": "vue-dynamic-mount",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -12,20 +12,11 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@vueuse/core": "^9.11.1",
-    "localforage": "^1.10.0",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.4",
-    "pinch-zoom-js": "^2.3.5",
     "pinia": "^2.0.28",
-    "rxjs": "^7.8.0",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6",
-    "vue3-toastify": "^0.0.4"
+    "vue": "^3.2.45"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
-    "@types/localforage": "^0.0.34",
     "@types/lodash": "^4.14.191",
     "@types/moment": "^2.13.0",
     "@types/node": "^18.11.12",

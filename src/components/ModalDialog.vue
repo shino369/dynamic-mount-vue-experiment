@@ -12,7 +12,8 @@ watch(
     if (newState.length > readyStack.value.length) {
       // push stack
       setTimeout(() => {
-        readyStack.value.push(1)
+        readyStack.value.push(1);
+        console.log(123)
       }, 150)
     } else {
       // pop stack

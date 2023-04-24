@@ -72,9 +72,9 @@ watch(
 
 <style scoped>
 .box-shadow-bk {
-    box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);
-    -webkit-box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);
-    -moz-box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);
+    box-shadow: 0px 1px 5px 0px rgb(100 100 100 / 30%);
+    -webkit-box-shadow: 0px 1px 5px 0px rgb(100 100 100 / 30%);
+    -moz-box-shadow: 0px 1px 5px 0px rgb(100 100 100 / 30%);
 }
 .border-bottom-bk {
     border-bottom: 1px solid #e5e5e5;

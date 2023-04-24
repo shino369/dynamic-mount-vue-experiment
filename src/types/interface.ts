@@ -1,89 +1,85 @@
-
 export interface ActionBtn {
-  name: string
-  iconName: string
-  className?: string
-  onClick(): void
+    name: string
+    iconName: string
+    className?: string
+    onClick(): void
 }
 
 export interface ModalDetail {
-  inputValue?: string
-  onInputChange?(_e: Event): void
-  header?: string
-  headerClass?: string
-  content: any
-  contentClass?: string
-  footer?: string
-  footerClass?: string
-  actionBtns?: ActionBtn[]
+    inputValue?: string
+    onInputChange?(_e: Event): void
+    header?: string
+    headerClass?: string
+    content: any
+    contentClass?: string
+    footer?: string
+    footerClass?: string
+    actionBtns?: ActionBtn[]
 }
 
 export interface ModalObject {
-  detail: ModalDetail
-  component: any
-  type: "modal" | "popup"
-  onClose(): void // action will fire after close()
+    detail: ModalDetail
+    component: any
+    type: 'modal' | 'popup'
+    onClose(): void // action will fire after close()
 }
 
 export interface MemAttributeRequest {
-  [key:string]: any
+    [key: string]: any
 }
 
 export interface MemAttributeResponse {
-  memAttributeTypes: {
-    [key:string]: any
-    MemAttributeOption: Record<string, any>[]
-  }[]
-  tnc: {
-    TmsExtraType: any
-  }[]
+    memAttributeTypes: {
+        [key: string]: any
+        MemAttributeOption: Record<string, any>[]
+    }[]
+    tnc: {
+        TmsExtraType: any
+    }[]
 }
 
 export interface Option<T> {
-  label: string
-  value: T
+    label: string
+    value: T
 }
 
 export interface ExtraTypes<T> {
-  type: string
-  id: string | number
-  options: Option<T>[]
+    type: string
+    id: string | number
+    options: Option<T>[]
 }
 
 export interface OptionVal {
-  type: string
-  value: string
+    type: string
+    value: string
 }
 
 export interface ExtraTypePropsData {
-  data: {
-     langKey:     string
-     outletId:    string
-     baseUrl:     string
-     id:          string
-     seq:         string
-     type:        string
-     show:        boolean
-     required:    boolean
-     validations: []
-     name_l1:     string
-     name_l2:     string
-     name_l3:     string
-     name_l4:     string
-     name_l5:     string
-     childType:   string
-     params:      {
-       mem_attribute_types:  OptionVal
-       terms_n_services_enable: OptionVal
-       terms_n_services_options: OptionVal
-     }
-   }
-  t: (_str:string) => string
+    langKey: string
+    outletId: string
+    baseUrl: string
+    id: string
+    seq: string
+    type: string
+    show: boolean
+    required: boolean
+    validations: []
+    name_l1: string
+    name_l2: string
+    name_l3: string
+    name_l4: string
+    name_l5: string
+    childType: string
+    params: {
+        mem_attribute_types: OptionVal
+        terms_n_services_enable: OptionVal
+        terms_n_services_options: OptionVal
+    }
 }
 
 export interface PhpProps<T = any> {
-  data: any | T
-  translation: Record<string, string>
-  view: string
-  uniqSelector: string
+    data: any | T
+    translation: Record<string, string>
+    view: string
+    uniqSelector: string
 }

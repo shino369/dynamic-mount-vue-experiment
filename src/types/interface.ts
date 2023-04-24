@@ -1,3 +1,9 @@
+declare global {
+    interface Window {
+        initVue: Function
+    }
+}
+
 export interface ActionBtn {
     name: string
     iconName: string
@@ -81,5 +87,5 @@ export interface PhpProps<T = any> {
     data: any | T
     translation: Record<string, string>
     view: string
-    uniqSelector: string
+    selector: string
 }

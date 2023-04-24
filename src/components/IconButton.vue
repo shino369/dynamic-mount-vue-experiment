@@ -33,7 +33,7 @@ const iconMap = new Map([
 
 </script>
 <template>
-  <div>
-    <component :is="iconMap.get(name)" :class="iconClassName" />
+  <div class="h-fit w-fit">
+    <component v-if="iconMap.get(name)" :is="iconMap.get(name)" :class="iconClassName" />
   </div>
 </template>

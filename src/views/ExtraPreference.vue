@@ -1,16 +1,23 @@
 <script setup lang="ts">
+import ExtraPreferenceModalContent from '@/components/ExtraPreferenceComponent/ExtraPreferenceModalContent.vue'
 import IconButton from '@/components/IconButton.vue'
 import ModalDialogHard from '@/components/ModalDialogHard.vue'
-import { viewProps } from '@/stores/viewProps'
+import { useLoading } from '@/stores/loading'
+import { viewPropsStore } from '@/stores/viewProps'
 import type {
     ExtraTypePropsData,
     ExtraTypes,
     MemAttributeResponse,
 } from '@/types'
 import { apiGet } from '@/utils/commonUtils'
-import { computed, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref, TransitionGroup, watch } from 'vue'
+//ExtraTypePropsData
+const { data, t } = viewPropsStore<ExtraTypePropsData>()
+const loading = useLoading()
+const { setLoading } = loading
+const { isLoading } = storeToRefs(loading)
 
-const { data, t } = viewProps<ExtraTypePropsData>()
 const show = ref(false)
 const extraTypes = ref<ExtraTypes<number>[]>([])
 const optionMap = ref<{ [key: number]: string }>({})
@@ -39,7 +46,7 @@ const rowArr: Record<string, string>[] = [
 ]
 
 const error = {
-    tnc: 'this_field_is_required',
+    tnc: t('this_field_is_required'),
 }
 
 const activeTab = ref('YOURS')
@@ -80,9 +87,13 @@ watch(
                   })
         // console.log(JSON.formData);
 
-        document
-            .getElementById('#ResvExtraPreference' + data.seq)
-            ?.setAttribute('value', formData)
+        const inputField = document.getElementById(
+            'ResvExtraPreference' + data.seq,
+        ) as HTMLInputElement
+        if (inputField) {
+            // console.log(inputField.value)
+            inputField.value = formData
+        }
     },
     {
         deep: true,
@@ -93,7 +104,7 @@ const fetchData = async () => {
     // fetch extra preference here
     const { outletId, params } = data
     const res = await apiGet<MemAttributeResponse>(
-        data.baseUrl + 'some_api_get_extra_preference',
+        data.baseUrl + 'get_extra_preference',
         {
             outletId: outletId,
             memAttributeTypeIds: params.mem_attribute_types.value,
@@ -151,17 +162,17 @@ const optionOnClick = (e: number) => {
 }
 </script>
 <template>
-    <div
+    <button
         type="button"
-        class="custom-text-color px-1 py-2 custom-bg-color btn btn-block btn-lg mb-2 flex items-center text-xs text-black"
+        class="custom-text-color px-1 py-2 custom-bg-color btn btn-block btn-lg mb-2 flex items-center text-[12px] text-black w-fit"
         @click="showDialog(true)"
     >
         {{ trans.select_extra_preferences }}
-        <IconButton :name="'plus'" iconClassName="" />
-    </div>
+        <IconButton :name="'plus'" iconClassName="w-6 h-6" />
+    </button>
     <div
         v-if="form.selectedSet.size > 0 || form.guestSelectedSet.size > 0"
-        class="text-xs selected-grid"
+        class="text-[12px] selected-grid p-2"
     >
         <div
             v-for="(arr, index) in rowArr"
@@ -176,12 +187,7 @@ const optionOnClick = (e: number) => {
             <div
                 v-for="(tag, index) in Array.from((form as Record<string, any>)[arr.sk])"
                 :key="index"
-                class="text-xs m-1 ml-0 p-0 px-1 rounded"
-                :style="{
-                    backgroundColor:
-                        index % 2 === 0 ? 'lightsteelblue' : 'lightgray',
-                    filter: index % 2 === 0 ? 'grayscale(1)' : '',
-                }"
+                class="text-[12px] m-1 ml-0 p-0 px-1 rounded bg-sky-600 text-white"
             >
                 {{ optionMap[tag as number] }}
             </div>
@@ -190,7 +196,7 @@ const optionOnClick = (e: number) => {
             class="js-input-data form-control p-2 h-40 overflow-auto my-2"
             :style="{
                 width: 'unset',
-                fontSize: '10px',
+                fontSize: '12px',
             }"
         >
             {{ tnc }}
@@ -200,7 +206,7 @@ const optionOnClick = (e: number) => {
                 :id="data.id + data.seq"
                 type="checkbox"
                 v-model="form.agree"
-                class="mt-0 mr-2"
+                class="checkbox-override"
             />
             <label :for="data.id + data.seq" class="mb-0">
                 {{ trans.i_agree }}
@@ -212,90 +218,35 @@ const optionOnClick = (e: number) => {
     </div>
 
     <ModalDialogHard :showDialog="showDialog" :show="show">
-        <div class="flex w-full mb-2 px-4 relative pt-4 uppercase">
-            <div
-                class="w-1/2 rounded-lg text-center select-none cursor-pointer relative"
-                @click="tabOnClick('YOURS')"
-            >
-                <div class="absolute z-[1051] w-[calc(100%-1rem)]">
-                    {{ trans.yours }}
-                </div>
-                {{ trans.yours }}
-            </div>
-            <div
-                class="w-1/2 rounded-lg text-center select-none cursor-pointer relative"
-                @click="tabOnClick('YOUR GUESTS')"
-            >
-                <div class="absolute z-[1051] w-[calc(100%-1rem)]">
-                    {{ trans.your_guests }}
-                </div>
-                {{ trans.your_guests }}
-            </div>
-            <div
-                class="custom-bg-color absolute z-[1050] w-[50%-1rem] h-[100%-0.75rem] opacity-50 rounded-lg transition-transform duration-300"
-                :class="{
-                    'translate-x-full': activeTab !== 'YOURS',
-                }"
-            ></div>
-        </div>
-        <div
-            class="px-2 flex items-center min-h-[50px] flex-wrap mb-4 py-4"
-            :style="{
-                borderBottom: '1px solid lightgray',
-            }"
-        >
-            <div class="mr-2">{{ trans.selected }}:</div>
-            <div
-                v-for="(tag, index) in Array.from(showList)"
-                :key="index"
-                class="flex center text-xs m-1 ml-0 py-0 px-1 rounded"
-                :style="{
-                    backgroundColor:
-                        index % 2 === 0 ? 'lightsteelblue' : 'lightgray',
-                }"
-            >
-                {{ optionMap[tag] }}
-                <IconButton
-                    @click="optionOnClick(tag)"
-                    :name="'trash'"
-                    iconClassName="cursor-pointer ml-2"
-                />
-            </div>
-        </div>
-        <div
-            class="flex flex-wrap max-w-[50vh] overflow-auto mb-2 flex-col px-2"
-            id="scroll-container"
-        >
-            <div v-for="(extraType, index) in extraTypes" :key="index">
-                <div>
-                    {{ extraType.type }}
-                </div>
-                <div class="flex flex-wrap">
-                    <div
-                        v-for="(option, index) in extraType.options"
-                        :key="index"
-                        @click="optionOnClick(option.value)"
-                        class="p-2 bg-gray-400 max-w-fit h-fit m-2 rounded-xl select-none cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.95]"
-                        :class="{
-                            'custom-bg-color': showList.has(option.value),
-                        }"
-                    >
-                        {{ option.label }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ExtraPreferenceModalContent
+            :tabOnClick="tabOnClick"
+            :optionOnClick="optionOnClick"
+            :trans="trans"
+            :activeTab="activeTab"
+            :showList="showList"
+            :optionMap="optionMap"
+            :extraTypes="extraTypes"
+        />
     </ModalDialogHard>
 </template>
 
 <style scoped>
+.btn:active {
+    outline: 1px auto -webkit-focus-ring-color !important;
+    outline-color: rgba(255,255,255,0.2) !important;
+}
+.btn:focus {
+    outline: 1px auto -webkit-focus-ring-color !important;
+    outline-color: rgba(255,255,255,0.2) !important;
+}
 .selected-grid {
     box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);
     -webkit-box-shadow: 0px 1px 5px 0px rgb(100 100 100 / 30%);
     -moz-box-shadow: 0px 1px 5px 0px rgb(100 100 100 / 30%);
 }
 
-.translate-right {
-    transform: translateX(100%);
+.checkbox-override {
+    margin: 0 !important;
+    margin-right: 0.5rem !important;
 }
 </style>

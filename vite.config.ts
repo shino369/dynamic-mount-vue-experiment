@@ -15,15 +15,16 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: '../webroot/js/vuejs/src/',
+    emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),
       name: "entry",
-      // the proper extensions will be added
       fileName: "entry",
-      formats: ["umd"],
+      formats: ["umd"], // umd or iife bundle all components into a single file
     },
     rollupOptions: {
-      // external: ['vue', 'lodash', 'moment', 'rxjs', 'localforage', 'vue-router']
+      // external: ['vue', 'lodash', 'moment', 'rxjs', 'localforage', 'vue-router'] // any external library you do not want to include add to here
     }
   },
   define: {

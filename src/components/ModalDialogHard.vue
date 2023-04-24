@@ -15,7 +15,7 @@ watch(
     () => props.show,
     (newState, _oldState) => {
         if (newState) {
-            document.body.style.overflow = 'hidden'
+            // document.body.style.overflow = 'hidden'
             preState.value = true
             setTimeout(() => {
                 postState.value = true
@@ -24,11 +24,11 @@ watch(
                 }
             }, 50)
         } else {
-            document.body.style.overflow = 'auto'
+            // document.body.style.overflow = 'auto'
             postState.value = false
             setTimeout(() => {
                 preState.value = false
-            }, 100)
+            }, 300)
         }
     },
 )
@@ -36,14 +36,20 @@ watch(
 <template>
     <div
         @click="showDialog(false)"
-        class="fixed top-0 left-0 z-[1050] h-full w-full justify-center items-center backdrop-contrast-50 transition-opacity overflow-hidden"
+        class="fixed top-0 left-0 z-[1050] h-full w-full justify-center items-center overflow-hidden transition-opacity duration-300 bg-custom"
+        :class="{
+            'delay-150': !show
+        }"
         :style="{
             display: preState ? 'flex' : 'none',
             opacity: postState ? 1 : 0,
         }"
     >
         <div
-            class="bg-white w-[90%] max-w-[600px] h-[80%] relative transition-transform p-2 overflow-hidden box-shadow-bk rounded"
+            class="bg-white w-[90%] max-w-[600px] h-[80%] relative p-2 overflow-hidden box-shadow-bk rounded transition-transform duration-300"
+            :class="{
+                'delay-150': show
+            }"
             :style="{
                 transform: postState ? 'translateY(0)' : 'translateY(100vh)',
             }"
@@ -78,5 +84,8 @@ watch(
 }
 .border-bottom-bk {
     border-bottom: 1px solid #e5e5e5;
+}
+.bg-custom {
+    background-color: rgba(0, 0, 0, 0.33);
 }
 </style>

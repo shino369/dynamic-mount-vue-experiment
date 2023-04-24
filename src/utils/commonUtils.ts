@@ -1,10 +1,14 @@
+import ExtraPreference from '@/views/ExtraPreference.vue'
+
 export const apiGet = async <R>(
-  url: string,
-  params: Record<string, any>
+    url: string,
+    params: Record<string, any>,
 ): Promise<R> => {
-  let paramStr = new URLSearchParams(params).toString()
-  paramStr = paramStr ? "?" + paramStr : paramStr
-  const res = await fetch(url + paramStr)
-  const jsonData = await res.json()
-  return jsonData as R
+    let paramStr = new URLSearchParams(params).toString()
+    paramStr = paramStr ? '?' + paramStr : paramStr
+    const res = await fetch(url + paramStr)
+    const jsonData = await res.json()
+    return jsonData as R
 }
+
+export const viewMapping = new Map([['ExtraPreference', ExtraPreference]])

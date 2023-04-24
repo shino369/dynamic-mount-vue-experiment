@@ -3,6 +3,7 @@ import { defineStore } from "pinia"
 import type { ModalObject } from "@/types"
 
 export const useModal = defineStore("modal", () => {
+  // modal store using stack
   const modalStack = ref<ModalObject[]>([])
   const modelPreStack = ref<number[]>([])
 

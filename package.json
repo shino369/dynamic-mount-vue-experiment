@@ -1,12 +1,13 @@
 {
   "name": "vue-dynamic-mount",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "dynamically mount view by passing props to function",
   "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build",
+    "dev": "vite build --watch",
     "test": "vite build --help",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
@@ -17,8 +18,6 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
-    "@types/lodash": "^4.14.191",
-    "@types/moment": "^2.13.0",
     "@types/node": "^18.11.12",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/eslint-config-prettier": "^7.0.0",

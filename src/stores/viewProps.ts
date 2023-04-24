@@ -1,13 +1,15 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { phpProps } from '@/main'
 import type { PhpProps } from '@/types'
 
-export const viewProps = <T = any>() => defineStore('viewProps', () => {
+export const viewPropsStore = <T = { [key: string]: any }>() => defineStore('viewPropsStore', () => {
     /**
      * properties passed from php
      */
-    const props = ref<PhpProps>(phpProps)
+    const data = ref<any>({})
+    const view = ref<string>('')
+    const selector = ref<string>('')
+    const translation = ref<Record<string, string>>({})
 
     /**
      * function to return translation by key
@@ -15,11 +17,20 @@ export const viewProps = <T = any>() => defineStore('viewProps', () => {
      * @returns
      */
     const t = (key: string) => {
-        return props.value.translation[key] || key
+        return translation.value[key] || key
+    }
+
+    const mountView = (key: string) => {
+        view.value = key
+        console.log(view.value)
     }
     // no setter
     return {
-        data: props.value.data as T,
+        data: data as T,
+        view,
+        selector,
+        translation,
         t,
+        mountView,
     }
 })()

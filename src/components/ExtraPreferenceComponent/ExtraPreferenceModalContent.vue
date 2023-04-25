@@ -52,13 +52,13 @@ defineProps<Props>()
             <div
                 v-for="(tag, index) in Array.from(showList)"
                 :key="index"
-                class="flex center text-[12px] m-1 ml-0 py-0 px-1 rounded items-center bg-sky-600 text-white transition-all"
+                class="flex center m-1 ml-0 py-0 px-1 rounded items-center custom-bg-color"
             >
                 {{ optionMap[tag] }}
                 <IconButton
                     @click="optionOnClick(tag)"
                     name="trash"
-                    iconClassName="cursor-pointer ml-2 w-5 h-5 text-white"
+                    iconClassName="cursor-pointer ml-2 w-5 h-5 text-black"
                 />
             </div>
         </TransitionGroup>

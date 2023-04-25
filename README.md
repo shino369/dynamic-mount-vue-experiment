@@ -1,18 +1,41 @@
-# Guide To Use Vue.js in Currently CakePHP project (TMS Module Only)
-### vue version @3.2.36
-vue@3.2.36\
-minified
-https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js
+# vue-dynamic-mount
+### vue version @3.2.45
 
-dev with comment
-https://unpkg.com/vue@3.2.36/dist/vue.global.js
+This project is aim to `dynamically mounting vue.js view/component to anywhere` in the cakephp generated HTML tempalte by simply inserting a `.ctp` component as entry point. As there is only minimal configuration in PHP side, you can use it in other kind of server side old project.
 
-official site
-https://vuejs.org/guide/quick-start.html
+This project use:
+- Vue.js 3.2 (Composition API)
+- Vue SFC (Single File Component)
+- TypeScript
+- Tailwind CSS
+- Vite + Rollup
 
-To enforce code style and reduce error, project is configured with ESlint and Prettier by setting up a node project.\
-Please run `npm i` or `yarn` and install corresponding module, and install the above VScode extension.\
-To start development, run `npm run dev` or `yarn dev`. It will create minified js file and copy to the webroot path automatically on file change. Run `npm run build` or `yarn build` for building only.
+To enforce code style and reduce error, project is configured with ESlint and Prettier.
+
+
+<br>
+
+### Recommended VScode Extensions
+- ESlint
+- Prettier
+- TypeScript Vue Plugin (Volar)
+- Vue Language Features (Volar)
+- Tailwind CSS IntelliSense
+- JavaScript (ES6) code snippets
+
+<br>
+
+## To Start with
+To start, run `npm i` / `yarn` to install required depenencies.To start development, run `npm run dev` / `yarn dev`. It will start the rollup file-watching function and rebuild the project on save. You can also manually build by `npm run build` / `yarn build`. The javascript source will be bundled into a single `entry.umd.js`, and scoped css will be bundled into `style.css`. create minified js file and copy to the webroot path automatically on file change. Run `npm run build` or `yarn build` for building only.
+
+Current build time and bundle size for 30kb project + 120kb vue.js main dependency :
+```
+build started...
+✓ 4 modules transformed.
+../webroot/js/vuejs/src/style.css      10.94 kB │ gzip:  3.06 kB
+../webroot/js/vuejs/src/entry.umd.js  130.64 kB │ gzip: 49.11 kB
+built in 633ms.
+```
 
 <br>
 
@@ -21,7 +44,7 @@ To start development, run `npm run dev` or `yarn dev`. It will create minified j
 <br>
 
 ## Entry Point
-To use vue.js in the project, you must use ctp file to serve as an entry point for receiving props. Call this in your view file:
+To use vue.js in the project, you have to use ctp file to serve as an entry point for receiving props. Call this in your view file:
 
 
 ```php
@@ -32,110 +55,39 @@ echo $this->element('vue_component',[
     'translation' => [
         'some_translate' => __d('tms', 'some_translate')
     ],
+    'config' => [
+        'baseUrl' => $this->HTML->url($langPath),
+        'langKey' => $langKey,
+        'customStyle' => $customStyle,
+    ],
     //not necessary. will random generate a unique selector if not provided.
     'selector' => $someUniqueSelector, 
-    'components' => [
-        // include one (and only one) view file in the pattern of [filename]View to serve as entry point
-        'someView'
-    ],
+    'view' => 'viewName'
 ]);
 ```
 
-All view and component files are located inside `Tms/Vuejs/src/`.
-- `components` should be put to `Tms/Vuejs/src/components/`
-- `views` should be put to `Tms/Vuejs/src/views/`
+The `vue_component.ctp` will include essential files
+- `webroot/js/vuejs/src/entry.umd.js` 
+- `webroot/js/vuejs/src/style.css`
 
-In case of any error, chnage to use manual hardcode for mapping.
-
-The `vue_component.ctp` is predefined to include essential files
-- `Tms/webroot/js/vuejs/vue.global.prod.js` 
-- `Tms/webroot/js/vuejs/src/component.js`
-
-The `component.js` is a single file of the compiled version of your components. It will be genereated automatically.
+The `entry.umd.js` is a single umd js file of the compiled version of your vue.js project. It will be genereated automatically on save.\
+To use other production build, change the config in vite.config.ts.
 
 ```php
-$essentials = [
-    /*'Vue' =>*/ '/tms/js/vuejs/vue.global.prod.js',
-    /* 'component' =>*/ '/tms/js/vuejs/src/component.js'
-];
+$this->Html->script('/js/vuejs/src/entry.umd.js', false);
+$this->Html->css('/js/vuejs/src/style.css', ['inline' => false]);
 ```
 
-After adding essential files to html head (once), The `vue_component.ctp` will add the components/views you stated to html head (once). It will then assign the necessary props passed by server to `commonUtils.setProps()`, and call the `Tms/webroot/js/vuejs/src/entry.js`  in inline script.
+After adding essential files to html head, The `vue_component.ctp` will assign the necessary props passed by server to a function called `initVue`, and start mouting the vue.js view.
 
 ```js
-  // this will be called and add props to window, and will delete after component mounted
-  window.commonUtils && window.commonUtils.setProps({
+
+  window.initVue && window.initVue({
     data: JSON.parse('<?php echo json_encode($data); ?>'),
     translation: JSON.parse('<?php echo json_encode($translation); ?>'),
-    components: JSON.parse('<?php echo json_encode($components); ?>'),
-    uniqSelector: '#<?php echo $uniqSelector; ?>'
+    view: '<?php echo $view; ?>',
+    selector: '#<?php echo $uniqSelector; ?>'
   });
-```
-
-The `Tms/webroot/js/vuejs/src/entry.js` will read the props and initialize `vue.js`.
-
-<br>
-
----
-
-<br>
-
-## Example of a Vue Component
-
-```js
-// eslint-disable-next-line no-unused-vars
-(function () {  // must use a unique name to declare in global
-    'use strict';
-    // global var
-    const { Vue, commonUtils } = window;
-    
-    if (!Vue || !commonUtils) {
-        throw new Error(`Vue.js and commonUtils.js not initialized.`);
-    }
-
-    // template. the html comment use "es6-string-html" extemsion to style html str
-    const templateStr = /*html*/ `
-    <div>
-        <button type="button" @click="countOnClick" > {{count}} </button>
-        <SomeComponent :propsToBePass="count" >
-            <!-- child -->
-        </SomeComponent>
-    </div>
-  `;
-
-    // script
-    const ComponentA = () => ({
-        template: templateStr,
-        props: {
-            someProps: Object,
-            someFunc: Function
-        },
-         components: {
-            ...commonUtils.registerComponent(['SomeComponent']),
-        },
-        setup(props) {
-            const { ref, onMounted, computed } = Vue;
-            const count = ref(0);
-
-            const countOnClick = () => {
-                count.value ++;
-                props.someFunc();
-            }
-
-            onMounted(() => {
-                console.log('component mounted!');
-            });
-
-            return { count };
-        },
-    });
-
-    // this is used to mount component
-    commonUtils.mount('ComponentA', {
-        ComponentA,
-    });
-})();
-
 
 ```
 
@@ -145,102 +97,166 @@ The `Tms/webroot/js/vuejs/src/entry.js` will read the props and initialize `vue.
 
 <br>
 
-## Future Development
-In general cases, using `type="module"` will be easier to handle:
-```html
-<script type="module">
-    import { componentA } from '../paths/ComponentA.js'
+## Vue.js
+
+### Example of a Vue.js SFC File
+The project will use vue SFC (Single File Component). SFC is file with `.vue` extension.\
+Please use camel-case to name view and component. For better define, name your view file with postfix/suffix `View` :\
+e.g. `SomethingView.vue`
+
+
+
+```ts
+// ExampleView.vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import IconButton from '@/components/icons/Icon-plus.vue'
+
+//  Type for Props must be declared inside SFC.
+//  Other types like ref<SomeType>() can use import
+interface Props {
+    name: string
+    enable: boolean
+}
+
+const props = defineProps<Props>()
+const count = ref<number>(0)
+
+const increment = () => {
+    props.enable && count.value++
+}
 </script>
-```
-But does not like normal npm module which will compiled by directly import module file will have cache issue, you need to add version number to the end, like `../paths/ComponentA.js?v=12345` to get updated version. And it is quite dumb to add a timestamp manually. 
+<template>
+    <div class="wrapper">
+        {{ count }}
+        <button class="max-h-10 max-w-10" type="button" @click="increment">
+            click me!
+        </button>
+        <IconButton :name="name" iconClassName="w-6 h-6 " />
+    </div>
+</template>
 
-```php
-    /* 
-        FOR FUTURE USAGE (?)
-        type=module are supported since 2017. We can use module to ensure scope separation for each code block
-        but the server genereally configured to refer to a cached file forever if not adding a timestamp or version for the file
-        
-        this will work, but dumb as fk:
-        <script type="module">
-        import { createApp } from '<?php echo $this->webroot.'/js/vuejs/vue.esm-browser.prod.js?'.(floor(microtime(true) / 10) * 10);?>'
-        import { ExtraPreference } from '<?php echo $this->webroot.'/js/vuejs/components/extraPreference/ExtraPreference-esm.js?'.(floor(microtime(true) / 10) * 10); ?>'
-        ...
-        </script>
-        
-        it can solve by using cdn serve directly 
-        or can use importmap to define the timestamp at once, but the browser support is still poor (see import_vue.ctp)
-        Define import mapping. After that you can directly import it from ctp, e.g.
-        in ctp view, call this on top:
-        include once in parent file only!!
-        echo $this->element('import_vue', [
-            'modules' => ['vue', 'utils'],
-            'components' => ['ExtraPreference']
-        ]);
-        then you can use 'import' statement:
-        <script type="module">  // type must be module
-            import { ref, createApp } from 'vue'
-            import { pipe } from 'utils'
-            import { ComponentA } from 'ComponentA'
-            createApp({
-                tempalte: `
-                    <ComponentA />
-                `,
-                components: {
-                    ComponentA
-                },
-                setup() {
-                    const count = ref(0)
-                    const increment = (e) => {
-                        count.value++
-                        console.log(count.value)
-                    }
-                    return {
-                        count, 
-                        increment,
-                    }
-                }
-            }).mount('#vue-app')
-        </script>
-    */
-    /*
-        $functionMapping = [
-            'vue' => $this->webroot.'/js/vuejs/vue.esm-browser.prod.js',
-            'utils' => $this->webroot.'/js/utils/commonUtils-esm.js',
-        ];
-        $componentMapping = [
-            'ExtraPreference' => $this->webroot.'/js/vuejs/components/extraPreference/ExtraPreference-esm.js'
-        ];
-        $mapArr = [];
-        if (isset($modules)){
-            foreach ($modules as $module) {
-                if (!empty($functionMapping[$module])) {
-                    $mapArr[$module] = $functionMapping[$module];
-                }
-            }
-        }
-        if (isset($components)) {
-            foreach ($components as $component) {
-                if (!empty($componentMapping[$component])) {
-                    $mapArr[$component] = $componentMapping[$component].'?'.floor(microtime(true) * 1000);
-                }
-            }
-        }
-        // safari support from version 16.4 (March, 2023), shall not use import map for now 
-        // wait until IOS 17 or 18 release
-        $support = false;
-        if(count($mapArr) > 0 && $support) {
-            $moduleMap = $this->Html->tag(
-                'script',
-                json_encode([
-                    "imports" => $mapArr
-                ]),
-                [	
-                    'type' => 'importmap',
-                    'inline' => false,
-                    'once' => false
-                ]
-            );
-            $this->append('script',  $moduleMap);
-        }
-    */
+<style scoped>
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+</style>
+
+
 ```
+
+<br>
+
+
+### Commonly Used Vue Function (Composition API)
+For more detail please see [official document](https://vuejs.org/guide/introduction.html)\
+script:
+```ts
+import {ref, computed, onMounted, watch } from 'vue'
+/**
+ * ref()
+ * use for reactive state
+ * reactive state is needed for template html to rerender
+ * type can be automatically referenced by initial value
+ * or added like ref<number>(0)
+ * generally ES6 proxy value
+ * inside <script> tag you need to acess by count.value
+ * inside <tempalte> tag you can acess directly by count
+ */
+const count = ref(0)
+const count2 = ref(-1)
+// count === 0
+count.value ++
+// count === 1
+count.value += count2.value
+// count === 0
+
+
+/**
+ * computed(()=>val)
+ * use for non-reactive variable (not using ref)
+ * can compute a reactive variable by non-reactive variable
+ * or reutrn some combined result
+ */
+let tempStr = ''                            // can no trigger rerender in <template>
+const compTemp = computed(() => tempStr)    // can trigger rerender in <template>
+const compCount = computed(() => count.value + count2.value)
+
+/**
+ * onMounted(()=> {})
+ * just like the react's componentDidMount
+ */
+onMounted(() => {
+    console.log('hello world!')
+})
+
+/**
+ * watch(()=> val,
+ * (newVal, oldVal) => {
+ *  // dp something
+ * }, {
+ *  // extra options
+ * })
+ */
+
+watch(
+    () => count.value,
+    (newVal, _oldVal) => {
+        console.log(newVal)
+    },
+    {
+        deep: true  // use to deeply watch nested proxy
+    }
+)
+
+```
+template:
+```html
+    <!-- [v-for] attribute, use for array looping -->
+    <div v-for="(num, index) in [1,2,3,4,5]" :key="num">
+        {{num}}
+    <div>
+
+    <!-- [v-if] attribute, will show the element if value is true -->
+    <div v-if="show">showing</div>
+
+    <!-- [@] event listener, and concat with .stop (stop propragation), .prevent (prevent default) -->
+    <button @click.stop.prevent="someFunction">click me</button>
+
+    <!-- [:+ traditional attr] can use variable / function determine -->
+    <div 
+        class="test" 
+        :class="{
+            'test-2': a > b
+        }"
+        :style="{
+            marginRight: a > b ? '1rem' : '2rem'
+        }"
+    ></div>
+    <div :class="`${a > b ? 'test-1' : 'test2'}`"></div>
+
+    <!-- component reveive props -->
+    <CompoentA :propsA="thisIsAVar" />
+    <CompoentB propsA="this is a string" />
+
+    <!--slot, see: https://vuejs.org/guide/components/slots.html#named-slots -->
+    <!-- component A -->
+    <div>
+        <slot></slot>
+    </div>
+
+    <ComponentA>
+        <div>content for slot</div>
+    </ComponentA>
+```
+
+### Tailwind CSS
+syntax is similar to bootstrap, but with enhanced power of `Arbitrary values` and other features.\
+see width as an example.
+```html
+<div class="w-[32rem]">
+  <!-- ... -->
+</div>
+```
+For more detail see [official document](https://tailwindcss.com/docs)

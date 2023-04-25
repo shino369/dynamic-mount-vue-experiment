@@ -16,6 +16,7 @@ module.exports = {
     ecmaVersion: "latest",
   },
   rules: {
+    semi: ['error', 'always'],
     "no-unused-vars": [
       "warn",
       {
@@ -23,6 +24,6 @@ module.exports = {
         varsIgnorePattern: "^_",
         caughtErrorsIgnorePattern: "^_",
       },
-    ],
+    ]
   },
 }

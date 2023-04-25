@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { ref, watch } from 'vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import { viewPropsStore } from '@/stores/viewProps'
-import { viewMapping } from '@/utils/commonUtils'
+import { viewMapping } from '@/utils/viewMapper'
 
 const viewProps = viewPropsStore()
 const { view } = storeToRefs(viewProps)

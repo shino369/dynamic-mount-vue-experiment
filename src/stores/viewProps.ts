@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { PhpProps } from '@/types'
 
 export const viewPropsStore = <T = { [key: string]: any }>() => defineStore('viewPropsStore', () => {
     /**
@@ -10,6 +9,15 @@ export const viewPropsStore = <T = { [key: string]: any }>() => defineStore('vie
     const view = ref<string>('')
     const selector = ref<string>('')
     const translation = ref<Record<string, string>>({})
+    const config = ref<{
+        baseUrl: string
+        langKey: string | number
+        customStyle: Record<string, Record<string, string>>
+    }>({
+        baseUrl: '',
+        langKey: 1,
+        customStyle: {}
+    })
 
     /**
      * function to return translation by key
@@ -30,6 +38,7 @@ export const viewPropsStore = <T = { [key: string]: any }>() => defineStore('vie
         view,
         selector,
         translation,
+        config,
         t,
         mountView,
     }

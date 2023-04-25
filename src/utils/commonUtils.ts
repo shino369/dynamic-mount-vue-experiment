@@ -1,5 +1,3 @@
-import ExtraPreference from '@/views/ExtraPreference.vue'
-
 export const apiGet = async <R>(
     url: string,
     params: Record<string, any>,
@@ -10,5 +8,3 @@ export const apiGet = async <R>(
     const jsonData = await res.json()
     return jsonData as R
 }
-
-export const viewMapping = new Map([['ExtraPreference', ExtraPreference]])

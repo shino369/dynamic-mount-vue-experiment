@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Button from '@/components/Button.vue'
 import ExtraPreferenceModalContent from '@/components/ExtraPreferenceComponent/ExtraPreferenceModalContent.vue'
-import IconButton from '@/components/IconButton.vue'
 import ModalDialogHard from '@/components/ModalDialogHard.vue'
 import { useLoading } from '@/stores/loading'
 import { viewPropsStore } from '@/stores/viewProps'
@@ -10,13 +10,27 @@ import type {
     MemAttributeResponse,
 } from '@/types'
 import { apiGet } from '@/utils/commonUtils'
-import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref, TransitionGroup, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 //ExtraTypePropsData
-const { data, t } = viewPropsStore<ExtraTypePropsData>()
+const { data, t, config } = viewPropsStore<ExtraTypePropsData>()
 const loading = useLoading()
-const { setLoading } = loading
-const { isLoading } = storeToRefs(loading)
+const isLoading = computed(() => loading.isLoading)
+
+const generalTextStyle = computed(() => ({
+    fontSize: config.customStyle.font_size.normal_text + 'px',
+    color: '#' + config.customStyle.general_text_color.font,
+}))
+
+const dialogStyles = computed(() => ({
+    backgroundColor:
+        '#' + config.customStyle.dialog_color_new_reservation.background,
+    color: '#' + config.customStyle.dialog_color_new_reservation.font,
+}))
+
+const buttonStyles = computed(() => ({
+    backgroundColor: '#' + config.customStyle.button_group.background,
+    color: '#' + config.customStyle.button_group.font,
+}))
 
 const show = ref(false)
 const extraTypes = ref<ExtraTypes<number>[]>([])
@@ -101,10 +115,11 @@ watch(
     },
 )
 const fetchData = async () => {
+    loading.setLoading(true)
     // fetch extra preference here
     const { outletId, params } = data
     const res = await apiGet<MemAttributeResponse>(
-        data.baseUrl + 'get_extra_preference',
+        config.baseUrl + 'tms/booking/get_extra_preference',
         {
             outletId: outletId,
             memAttributeTypeIds: params.mem_attribute_types.value,
@@ -114,27 +129,32 @@ const fetchData = async () => {
     // console.log(res);
     extraTypes.value = res.memAttributeTypes.map((mt) => {
         return {
-            type: mt.MemAttributeType[`atyp_name_l${data.langKey}`],
+            type: mt.MemAttributeType[`atyp_name_l${config.langKey}`],
             id: mt.MemAttributeType.atyp_id,
             options: mt.MemAttributeOption.map((op) => {
-                optionMap.value[op.atto_id] = op[`atto_name_l${data.langKey}`]
+                optionMap.value[op.atto_id] = op[`atto_name_l${config.langKey}`]
                 typeMapper.set(op.atto_id, mt.MemAttributeType.atyp_id)
                 return {
-                    label: op[`atto_name_l${data.langKey}`],
+                    label: op[`atto_name_l${config.langKey}`],
                     value: op.atto_id,
                 }
             }),
         }
     })
     tnc.value = res.tnc
-        .map((t) => t.TmsExtraType[`etyp_info_l${data.langKey}`])
+        .map((t) => t.TmsExtraType[`etyp_info_l${config.langKey}`])
         .join()
+
+    setTimeout(() => {
+        loading.setLoading(false)
+    }, 300)
 }
 
 onMounted(() => {
     // console.log('component mounted');
     // console.log(props.data);
     fetchData()
+    console.log(config)
 })
 const showList = computed(() =>
     activeTab.value === 'YOURS'
@@ -162,17 +182,20 @@ const optionOnClick = (e: number) => {
 }
 </script>
 <template>
-    <button
-        type="button"
-        class="custom-text-color px-1 py-2 custom-bg-color btn btn-block btn-lg mb-2 flex items-center text-[12px] text-black w-fit"
+    <Button
+        :disabled="isLoading"
+        :icon="isLoading ? 'spinner' : 'plus'"
+        btnClassName="px-1 py-2 btn btn-block btn-lg mb-2 flex items-center w-fit"
+        iconClassName="w-6 h-6 ml-2 text-black"
         @click="showDialog(true)"
+        :style="{ ...generalTextStyle, ...buttonStyles }"
     >
         {{ trans.select_extra_preferences }}
-        <IconButton :name="'plus'" iconClassName="w-6 h-6" />
-    </button>
+    </Button>
     <div
         v-if="form.selectedSet.size > 0 || form.guestSelectedSet.size > 0"
-        class="text-[12px] selected-grid p-2"
+        class="selected-grid p-2"
+        :style="generalTextStyle"
     >
         <div
             v-for="(arr, index) in rowArr"
@@ -187,7 +210,7 @@ const optionOnClick = (e: number) => {
             <div
                 v-for="(tag, index) in Array.from((form as Record<string, any>)[arr.sk])"
                 :key="index"
-                class="text-[12px] m-1 ml-0 p-0 px-1 rounded bg-sky-600 text-white"
+                class="m-1 ml-0 p-0 px-1 rounded custom-bg-color"
             >
                 {{ optionMap[tag as number] }}
             </div>
@@ -206,7 +229,7 @@ const optionOnClick = (e: number) => {
                 :id="data.id + data.seq"
                 type="checkbox"
                 v-model="form.agree"
-                class="checkbox-override"
+                class="checkbox-override w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded"
             />
             <label :for="data.id + data.seq" class="mb-0">
                 {{ trans.i_agree }}
@@ -233,11 +256,11 @@ const optionOnClick = (e: number) => {
 <style scoped>
 .btn:active {
     outline: 1px auto -webkit-focus-ring-color !important;
-    outline-color: rgba(255,255,255,0.2) !important;
+    outline-color: rgba(255, 255, 255, 0.2) !important;
 }
 .btn:focus {
     outline: 1px auto -webkit-focus-ring-color !important;
-    outline-color: rgba(255,255,255,0.2) !important;
+    outline-color: rgba(255, 255, 255, 0.2) !important;
 }
 .selected-grid {
     box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);

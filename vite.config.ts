@@ -31,13 +31,20 @@ export default defineConfig({
     // target: ['modules'],           
     // minify: 'esbuild',             // default use esbuild. approx 40x faster than terser
     // assetsDir: '../webroot/img', 
-    outDir: '../webroot/js/vuejs/src/',
+    assetsInlineLimit: 4096,
+    outDir: '../Plugin/Tms/webroot/vuejs/src/',
     emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),
       name: "entry",
       fileName: "entry",
-      formats: ["umd"], // umd or iife bundle all components into a single file
+       /**
+        * umd or iife bundle all components into a single file, but for smaller project it will have smaller size.
+        * es module will split async component to chunk, but the main file will be larger. suitable for larger project
+        * 
+        * set type: "module" to let the build extension be '.js' instead of '.cjs' if using es build
+        * */
+      formats: [ /*"es",*/  "umd"],
     },
     rollupOptions: {
       // external: ['vue', 'lodash', 'moment', 'localforage'] // any external library you do not want to include add to here

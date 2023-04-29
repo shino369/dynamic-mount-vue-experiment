@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-#app {
-  /* max-width: 1280px; */
-  /* width: 100%; */
+/* #app {
+  max-width: 1280px;
+  width: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
+} */
+
+/* .tailwind-base {} */

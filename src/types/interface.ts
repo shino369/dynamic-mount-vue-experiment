@@ -1,3 +1,5 @@
+import type { IconName } from "@/components/IconButton.vue"
+
 declare global {
     interface Window {
         initVue: Function
@@ -6,7 +8,7 @@ declare global {
 
 export interface ActionBtn {
     name: string
-    iconName: string
+    iconName: IconName
     className?: string
     onClick(): void
 }

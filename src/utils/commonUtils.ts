@@ -8,3 +8,13 @@ export const apiGet = async <R>(
     const jsonData = await res.json()
     return jsonData as R
 }
+
+export const debounce = (callback: Function, wait: number) => {
+    let timeoutId:any = null
+    return (...args: any) => {
+        window.clearTimeout(timeoutId)
+        timeoutId = window.setTimeout(() => {
+            callback.apply(null, args)
+        }, wait)
+    }
+}

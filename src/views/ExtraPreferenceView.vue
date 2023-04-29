@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import ExtraPreferenceModalContent from '@/components/ExtraPreferenceComponent/ExtraPreferenceModalContent.vue'
+import IconButton from '@/components/IconButton.vue'
 import ModalDialogHard from '@/components/ModalDialogHard.vue'
 import { useLoading } from '@/stores/loading'
 import { viewPropsStore } from '@/stores/viewProps'
@@ -17,19 +18,19 @@ const loading = useLoading()
 const isLoading = computed(() => loading.isLoading)
 
 const generalTextStyle = computed(() => ({
-    fontSize: config.customStyle.font_size.normal_text + 'px',
-    color: '#' + config.customStyle.general_text_color.font,
+    fontSize: config.customStyle?.font_size?.normal_text + 'px',
+    color: '#' + config.customStyle?.general_text_color?.font,
 }))
 
 const dialogStyles = computed(() => ({
     backgroundColor:
-        '#' + config.customStyle.dialog_color_new_reservation.background,
-    color: '#' + config.customStyle.dialog_color_new_reservation.font,
+        '#' + config.customStyle?.dialog_color_new_reservation?.background,
+    color: '#' + config.customStyle?.dialog_color_new_reservation?.font,
 }))
 
 const buttonStyles = computed(() => ({
-    backgroundColor: '#' + config.customStyle.button_group.background,
-    color: '#' + config.customStyle.button_group.font,
+    backgroundColor: '#' + config.customStyle?.button_group?.background,
+    color: '#' + config.customStyle?.button_group?.font,
 }))
 
 const show = ref(false)
@@ -154,7 +155,7 @@ onMounted(() => {
     // console.log('component mounted');
     // console.log(props.data);
     fetchData()
-    console.log(config)
+    // console.log(config)
 })
 const showList = computed(() =>
     activeTab.value === 'YOURS'
@@ -180,6 +181,13 @@ const optionOnClick = (e: number) => {
             : form.value.guestSelectedSet.add(e)
     }
 }
+
+const onClear = () => {
+    activeTab.value === 'YOURS'
+        ? form.value.selectedSet.clear()
+        : form.value.guestSelectedSet.clear()
+}
+
 </script>
 <template>
     <Button
@@ -210,7 +218,13 @@ const optionOnClick = (e: number) => {
             <div
                 v-for="(tag, index) in Array.from((form as Record<string, any>)[arr.sk])"
                 :key="index"
-                class="m-1 ml-0 p-0 px-1 rounded custom-bg-color"
+                class="m-1 ml-0 p-0 px-1 rounded"
+                @click="
+                    () => {
+                        // optionOnClick(tag as number)
+                    }
+                "
+                :style="{ ...buttonStyles }"
             >
                 {{ optionMap[tag as number] }}
             </div>
@@ -243,12 +257,14 @@ const optionOnClick = (e: number) => {
     <ModalDialogHard :showDialog="showDialog" :show="show">
         <ExtraPreferenceModalContent
             :tabOnClick="tabOnClick"
+            :clear="onClear"
             :optionOnClick="optionOnClick"
             :trans="trans"
             :activeTab="activeTab"
             :showList="showList"
             :optionMap="optionMap"
             :extraTypes="extraTypes"
+            :buttonStyles="buttonStyles"
         />
     </ModalDialogHard>
 </template>

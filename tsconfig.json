@@ -2,17 +2,20 @@
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "target": "es2022",
+    "target": "esnext",
+    "module": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
       "es2022"
     ],
-    "ignoreDeprecations": "5.0"
+    "sourceMap": true,
+    "ignoreDeprecations": "5.0",
+    "noImplicitAny": true,
   },
 
   "references": [

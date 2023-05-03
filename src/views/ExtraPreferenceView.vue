@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from '@/components/Button.vue'
+import ButtonComponent from '@/components/ButtonComponent.vue'
 import ExtraPreferenceModalContent from '@/components/ExtraPreferenceComponent/ExtraPreferenceModalContent.vue'
 import ModalDialogHard from '@/components/ModalDialogHard.vue'
 import { useLoading } from '@/stores/loading'
@@ -17,19 +17,19 @@ const loading = useLoading()
 const isLoading = computed(() => loading.isLoading)
 
 const generalTextStyle = computed(() => ({
-    fontSize: config.customStyle.font_size.normal_text + 'px',
-    color: '#' + config.customStyle.general_text_color.font,
+    fontSize: config.customStyle?.font_size?.normal_text + 'px',
+    color: '#' + config.customStyle?.general_text_color?.font,
 }))
 
-const dialogStyles = computed(() => ({
+const _dialogStyles = computed(() => ({
     backgroundColor:
-        '#' + config.customStyle.dialog_color_new_reservation.background,
-    color: '#' + config.customStyle.dialog_color_new_reservation.font,
+        '#' + config.customStyle?.dialog_color_new_reservation?.background,
+    color: '#' + config.customStyle?.dialog_color_new_reservation?.font,
 }))
 
 const buttonStyles = computed(() => ({
-    backgroundColor: '#' + config.customStyle.button_group.background,
-    color: '#' + config.customStyle.button_group.font,
+    backgroundColor: '#' + config.customStyle?.button_group?.background,
+    color: '#' + config.customStyle?.button_group?.font,
 }))
 
 const show = ref(false)
@@ -102,7 +102,7 @@ watch(
         // console.log(JSON.formData);
 
         const inputField = document.getElementById(
-            'ResvExtraPreference' + data.seq,
+            (data as any).fieldId,
         ) as HTMLInputElement
         if (inputField) {
             // console.log(inputField.value)
@@ -152,9 +152,9 @@ const fetchData = async () => {
 
 onMounted(() => {
     // console.log('component mounted');
-    // console.log(props.data);
+    console.log(data)
     fetchData()
-    console.log(config)
+    // console.log(config)
 })
 const showList = computed(() =>
     activeTab.value === 'YOURS'
@@ -180,9 +180,15 @@ const optionOnClick = (e: number) => {
             : form.value.guestSelectedSet.add(e)
     }
 }
+
+const onClear = () => {
+    activeTab.value === 'YOURS'
+        ? form.value.selectedSet.clear()
+        : form.value.guestSelectedSet.clear()
+}
 </script>
 <template>
-    <Button
+    <ButtonComponent
         :disabled="isLoading"
         :icon="isLoading ? 'spinner' : 'plus'"
         btnClassName="px-1 py-2 btn btn-block btn-lg mb-2 flex items-center w-fit"
@@ -191,7 +197,7 @@ const optionOnClick = (e: number) => {
         :style="{ ...generalTextStyle, ...buttonStyles }"
     >
         {{ trans.select_extra_preferences }}
-    </Button>
+    </ButtonComponent>
     <div
         v-if="form.selectedSet.size > 0 || form.guestSelectedSet.size > 0"
         class="selected-grid p-2"
@@ -210,7 +216,13 @@ const optionOnClick = (e: number) => {
             <div
                 v-for="(tag, index) in Array.from((form as Record<string, any>)[arr.sk])"
                 :key="index"
-                class="m-1 ml-0 p-0 px-1 rounded custom-bg-color"
+                class="m-1 ml-0 p-0 px-1 rounded"
+                @click="
+                    () => {
+                        // optionOnClick(tag as number)
+                    }
+                "
+                :style="{ ...buttonStyles }"
             >
                 {{ optionMap[tag as number] }}
             </div>
@@ -243,12 +255,14 @@ const optionOnClick = (e: number) => {
     <ModalDialogHard :showDialog="showDialog" :show="show">
         <ExtraPreferenceModalContent
             :tabOnClick="tabOnClick"
+            :clear="onClear"
             :optionOnClick="optionOnClick"
             :trans="trans"
             :activeTab="activeTab"
             :showList="showList"
             :optionMap="optionMap"
             :extraTypes="extraTypes"
+            :buttonStyles="buttonStyles"
         />
     </ModalDialogHard>
 </template>

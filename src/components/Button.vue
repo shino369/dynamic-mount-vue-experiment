@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { StyleValue } from 'vue'
-import IconButton from './IconButton.vue'
+import IconButton, { type IconName } from './IconButton.vue'
 
 interface Props {
-    icon?: string
+    icon?: IconName
     disabled?: boolean
     btnClassName?: string
     btnStyle?: StyleValue
@@ -20,7 +20,7 @@ withDefaults(defineProps<Props>(), {
     <button
         :type="type"
         :class="btnClassName || ''"
-        class="flex items-center justify-between px-2 py-1"
+        class="tw-btn flex items-center justify-between px-2 py-1"
         :style="btnStyle"
         :disabled="disabled"
     >
@@ -33,5 +33,20 @@ withDefaults(defineProps<Props>(), {
 button:disabled {
     cursor: not-allowed !important;
     opacity: 0.7 !important;
+}
+
+.tw-btn {
+    border: none;
+}
+.tw-btn:hover {
+    opacity: 0.7;
+}
+.tw-btn:active {
+    outline-offset: 0px !important;
+}
+
+/* override bootstrap 3 btn style */
+.tw-btn:focus {
+    outline-offset: 0px !important;
 }
 </style>

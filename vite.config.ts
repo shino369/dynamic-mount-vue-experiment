@@ -36,6 +36,10 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
+    esbuild: {
+        // drop: ['console', 'debugger'],
+        pure: ['console.log'],
+    },
     build: {
         // target: ['modules'],
         // minify: 'esbuild',             // default use esbuild. approx 40x faster than terser

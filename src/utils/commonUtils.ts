@@ -10,7 +10,7 @@ export const apiGet = async <R>(
 }
 
 export const debounce = (callback: Function, wait: number) => {
-    let timeoutId:any = null
+    let timeoutId: any = null
     return (...args: any) => {
         window.clearTimeout(timeoutId)
         timeoutId = window.setTimeout(() => {

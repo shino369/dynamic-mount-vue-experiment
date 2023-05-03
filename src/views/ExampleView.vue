@@ -26,7 +26,6 @@ const clear = () => {
 }
 
 const debouncedSave = debounce(() => {
-    console.log('saving...')
     setStorage<number>('count', count.value)
     setStorage<string>('text', text.value)
 }, 1000)

@@ -5,6 +5,7 @@ import ModalDialogHard from '@/components/ModalDialogHard.vue'
 import { useLoading } from '@/stores/loading'
 import { viewPropsStore } from '@/stores/viewProps'
 import type {
+    APIResponse,
     ExtraTypePropsData,
     ExtraTypes,
     MemAttributeResponse,
@@ -16,27 +17,29 @@ const { data, t, config } = viewPropsStore<ExtraTypePropsData>()
 const loading = useLoading()
 const isLoading = computed(() => loading.isLoading)
 
-const generalTextStyle = computed(() => ({
+const generalTextStyle = {
     fontSize: config.customStyle?.font_size?.normal_text + 'px',
     color: '#' + config.customStyle?.general_text_color?.font,
-}))
+}
 
-const _dialogStyles = computed(() => ({
+const _dialogStyles = {
     backgroundColor:
         '#' + config.customStyle?.dialog_color_new_reservation?.background,
     color: '#' + config.customStyle?.dialog_color_new_reservation?.font,
-}))
+}
 
-const buttonStyles = computed(() => ({
+const buttonStyles = {
     backgroundColor: '#' + config.customStyle?.button_group?.background,
     color: '#' + config.customStyle?.button_group?.font,
-}))
+}
 
 const show = ref(false)
 const extraTypes = ref<ExtraTypes<number>[]>([])
 const optionMap = ref<{ [key: number]: string }>({})
 const tnc = ref('')
 const typeMapper = new Map()
+const apiError = ref(false)
+const validProps = ref(false)
 
 const trans: Record<string, string> = {
     yours: t('yours'),
@@ -47,6 +50,8 @@ const trans: Record<string, string> = {
     i_agree: t('i_agree'),
     select_extra_preferences: t('select_extra_preferences'),
 }
+
+const btnName = computed(() => (data as any)['name_l' + config.langKey])
 
 const rowArr: Record<string, string>[] = [
     {
@@ -118,42 +123,59 @@ const fetchData = async () => {
     loading.setLoading(true)
     // fetch extra preference here
     const { outletId, params } = data
-    const res = await apiGet<MemAttributeResponse>(
-        config.baseUrl + 'tms/booking/get_extra_preference',
-        {
-            outletId: outletId,
-            memAttributeTypeIds: params.mem_attribute_types.value,
-            tncId: params.terms_n_services_options.value,
-        },
-    )
-    // console.log(res);
-    extraTypes.value = res.memAttributeTypes.map((mt) => {
-        return {
-            type: mt.MemAttributeType[`atyp_name_l${config.langKey}`],
-            id: mt.MemAttributeType.atyp_id,
-            options: mt.MemAttributeOption.map((op) => {
-                optionMap.value[op.atto_id] = op[`atto_name_l${config.langKey}`]
-                typeMapper.set(op.atto_id, mt.MemAttributeType.atyp_id)
-                return {
-                    label: op[`atto_name_l${config.langKey}`],
-                    value: op.atto_id,
-                }
-            }),
+    try {
+        const res = await apiGet<APIResponse<MemAttributeResponse>>(
+            config.baseUrl + 'tms/booking/get_extra_preference',
+            {
+                outletId: outletId,
+                memAttributeTypeIds: params.mem_attribute_types.value,
+                tncId: params.terms_n_services_options.value,
+            },
+        )
+        // console.log(res);
+        if (res.error) {
+            throw new Error(res.error)
         }
-    })
-    tnc.value = res.tnc
-        .map((t) => t.TmsExtraType[`etyp_info_l${config.langKey}`])
-        .join()
+        extraTypes.value = res.memAttributeTypes?.map((mt) => {
+            return {
+                type: mt.MemAttributeType[`a    typ_name_l${config.langKey}`],
+                id: mt.MemAttributeType.atyp_id,
+                options: mt.MemAttributeOption.map((op) => {
+                    optionMap.value[op.atto_id] =
+                        op[`atto_name_l${config.langKey}`]
+                    typeMapper.set(op.atto_id, mt.MemAttributeType.atyp_id)
+                    return {
+                        label: op[`atto_name_l${config.langKey}`],
+                        value: op.atto_id,
+                    }
+                }),
+            }
+        })
+        tnc.value = res.tnc
+            .map((t) => t.TmsExtraType[`etyp_info_l${config.langKey}`])
+            .join()
 
-    setTimeout(() => {
+        setTimeout(() => {
+            loading.setLoading(false)
+        }, 300)
+    } catch (error) {
+        console.error(error)
         loading.setLoading(false)
-    }, 300)
+        apiError.value = true
+    }
 }
 
 onMounted(() => {
     // console.log('component mounted');
-    console.log(data)
-    fetchData()
+    // console.log(data)
+    if (
+        data.params.mem_attribute_types.value &&
+        data.params.terms_n_services_options.value &&
+        data.outletId
+    ) {
+        validProps.value = true
+        fetchData()
+    }
     // console.log(config)
 })
 const showList = computed(() =>
@@ -189,15 +211,17 @@ const onClear = () => {
 </script>
 <template>
     <ButtonComponent
-        :disabled="isLoading"
+        v-if="validProps"
+        :disabled="isLoading || apiError"
+        :text="btnName"
         :icon="isLoading ? 'spinner' : 'plus'"
-        btnClassName="px-1 py-2 btn btn-block btn-lg mb-2 flex items-center w-fit"
+        :btnClassName="`px-1 py-2 btn btn-block btn-lg mb-2 flex items-center w-fit ${
+            apiError ? ' border border-red-400 border-solid' : ''
+        }`"
         iconClassName="w-6 h-6 ml-2 text-black"
         @click="showDialog(true)"
         :style="{ ...generalTextStyle, ...buttonStyles }"
-    >
-        {{ trans.select_extra_preferences }}
-    </ButtonComponent>
+    />
     <div
         v-if="form.selectedSet.size > 0 || form.guestSelectedSet.size > 0"
         class="selected-grid p-2"

@@ -4,6 +4,7 @@ import IconButton, { type IconName } from './IconButton.vue'
 
 interface Props {
     icon?: IconName
+    text?: string
     disabled?: boolean
     btnClassName?: string
     btnStyle?: StyleValue
@@ -24,7 +25,7 @@ withDefaults(defineProps<Props>(), {
         :style="btnStyle"
         :disabled="disabled"
     >
-        <slot></slot>
+        {{ text }}
         <IconButton v-if="icon" :name="icon" :iconClassName="iconClassName" />
     </button>
 </template>
@@ -35,9 +36,9 @@ button:disabled {
     opacity: 0.7 !important;
 }
 
-.tw-btn {
+/* .tw-btn {
     border: none;
-}
+} */
 .tw-btn:hover {
     opacity: 0.7;
 }

@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/IconButton.vue"
+import type { IconName } from '@/components/IconButton.vue'
 
 declare global {
     interface Window {
@@ -45,6 +45,12 @@ export interface MemAttributeResponse {
         TmsExtraType: any
     }[]
 }
+
+export interface ErrorResponse {
+    error: string
+}
+
+export type APIResponse<T> = T & ErrorResponse
 
 export interface Option<T> {
     label: string

@@ -1,26 +1,30 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
+import { defineAsyncComponent, ref, watch } from 'vue'
 // import ModalDialog from '@/components/ModalDialog.vue'
 import { viewPropsStore } from '@/stores/viewProps'
 import ErrorBoundary from '@/components/ErrorBoundary.vue'
 import ExtraPreferenceView from '@/views/ExtraPreferenceView.vue'
-import ExampleView from './views/ExampleView.vue'
-// import { useStorageStore } from './stores/storage'
+// import ExampleView from './views/ExampleView.vue'
+import { useStorageStore } from '@/stores/storage'
 
 const viewProps = viewPropsStore()
-// const storageStore = useStorageStore()
+useStorageStore()
 const { view } = storeToRefs(viewProps)
-const compRef = ref()
+const compRef = ref(false)
 
 // this necessary for chunk splitting
 const viewMap = new Map([
     [
         'ExampleView',
-        // defineAsyncComponent(() => import('@/views/ExampleView.vue')),   // if support async import
-        ExampleView,
+        defineAsyncComponent(() => import('@/views/ExampleView.vue')), // if support async import
+        // ExampleView,
     ],
-    ['ExtraPreferenceView', ExtraPreferenceView],
+    [
+        'ExtraPreferenceView',
+        // defineAsyncComponent(() => import('@/views/ExtraPreferenceView.vue')),
+        ExtraPreferenceView,
+    ],
 ])
 
 watch(
@@ -28,7 +32,7 @@ watch(
     (newState, _oldState) => {
         if (newState && !compRef.value) {
             // console.log('mounting ', view.value.trim())
-            compRef.value = viewMap.get(view.value.trim()) || '' //viewMapping[view.value.trim()] || ''
+            compRef.value = true
         }
     },
     {
@@ -39,8 +43,11 @@ watch(
 
 <template>
     <ErrorBoundary>
-        <component v-if="compRef" :is="compRef" />
-        <div v-if="!compRef">
+        <component
+            v-if="compRef && viewMap.get(view.trim())"
+            :is="viewMap.get(view.trim()) as any"
+        />
+        <div v-if="!compRef || !viewMap.get(view.trim())">
             {{ view ? `view [${view}] not found` : 'mounting...' }}
         </div>
         <!-- <ModalDialog /> -->

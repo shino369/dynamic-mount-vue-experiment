@@ -13,7 +13,7 @@ import IconTick from './icons/Icon-tick.vue'
 import IconTrash from './icons/Icon-trash.vue'
 
 // too many files, stattically import to prevent chunk splitting
-const iconMap = {
+const iconMap: { [key: string]: any } = {
     all: IconAll,
     edit: IconEdit,
     menu: IconMenu,
@@ -30,12 +30,11 @@ const iconMap = {
 export type IconName = keyof typeof iconMap & string
 
 interface Props {
-    name: IconName
+    name: string
     iconClassName: string
 }
 const props = defineProps<Props>()
 const iconRef = computed(() => iconMap[props.name])
-
 </script>
 <template>
     <div class="h-fit w-fit">

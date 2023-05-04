@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "description": "dynamically mount view by passing props to function",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build",
     "dev": "vite build --watch",
-    "test": "vite build --help",
+    "test": "vite",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.ts --fix",
     "nodemon": "nodemon -e js,ts,vue --watch src --exec \"yarn build\""

@@ -26,7 +26,8 @@ export const viewPropsStore = <T = { [key: string]: any }>() =>
          * @returns
          */
         const t = (key: string) => {
-            return translation.value[key] && typeof translation.value[key] === 'string'
+            return translation.value[key] &&
+                typeof translation.value[key] === 'string'
                 ? translation.value[key]
                 : key
         }

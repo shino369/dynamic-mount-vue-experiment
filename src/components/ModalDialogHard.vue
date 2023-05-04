@@ -38,7 +38,7 @@ watch(
         @click="showDialog(false)"
         class="fixed top-0 left-0 z-[1050] h-full w-full justify-center items-center overflow-hidden transition-opacity duration-300 bg-custom"
         :class="{
-            'delay-150': !show
+            'delay-150': !show,
         }"
         :style="{
             display: preState ? 'flex' : 'none',
@@ -48,7 +48,7 @@ watch(
         <div
             class="bg-white w-[90%] max-w-[600px] h-[80%] relative p-2 overflow-hidden box-shadow-bk rounded transition-transform duration-300"
             :class="{
-                'delay-150': show
+                'delay-150': show,
             }"
             :style="{
                 transform: postState ? 'translateY(0)' : 'translateY(100vh)',

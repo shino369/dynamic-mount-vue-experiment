@@ -51,22 +51,20 @@ watch(
         <div class="flex items-center py-2">
             <ButtonComponent
                 icon="close"
+                text="clear"
                 iconClassName="ml-2 w-5 h-5"
                 btnClassName="bg-white rounded w-fit active:opacity-50"
                 type="button"
                 @click="clear"
-            >
-                clear
-            </ButtonComponent>
+            />
             <ButtonComponent
                 icon="plus"
+                text="increment"
                 iconClassName="ml-2 w-5 h-5"
                 btnClassName="bg-white rounded w-fit active:opacity-50  ml-4"
                 type="button"
                 @click="increment"
-            >
-                increment
-            </ButtonComponent>
+            />
         </div>
     </div>
 </template>

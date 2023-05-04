@@ -33,20 +33,15 @@ export function initialize(props: PhpProps) {
                 // console.log(rehydrated)
                 store.$patch(rehydrated)
 
-                store.$subscribe(
-                    (_state) => {
-                        try {
-                            // for some case (deeply nested object with differenct types, serialization not work, need to use lodash clonedeep)
-                            const cloned = JSON.stringify(store.$state)
-                            localStorage.setItem(
-                                'vue-storage-' + store.$id,
-                                cloned,
-                            )
-                        } catch (error) {
-                            console.error(error)
-                        }
+                store.$subscribe((_state) => {
+                    try {
+                        // for some case (deeply nested object with differenct types, serialization not work, need to use lodash clonedeep)
+                        const cloned = JSON.stringify(store.$state)
+                        localStorage.setItem('vue-storage-' + store.$id, cloned)
+                    } catch (error) {
+                        console.error(error)
                     }
-                )
+                })
             }
         }
 

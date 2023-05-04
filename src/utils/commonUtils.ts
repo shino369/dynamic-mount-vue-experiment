@@ -2,7 +2,17 @@ export const apiGet = async <R>(
     url: string,
     params: Record<string, any>,
 ): Promise<R> => {
-    let paramStr = new URLSearchParams(params).toString()
+    const reducedParams = Object.entries(params).reduce(
+        (accu, [key, value]) => {
+            const add = value ? { [key]: value } : {}
+            return {
+                ...accu,
+                ...add,
+            }
+        },
+        {},
+    )
+    let paramStr = new URLSearchParams(reducedParams).toString()
     paramStr = paramStr ? '?' + paramStr : paramStr
     const res = await fetch(url + paramStr)
     const jsonData = await res.json()

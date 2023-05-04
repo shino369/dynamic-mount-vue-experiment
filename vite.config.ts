@@ -24,33 +24,33 @@ export default defineConfig({
         checker({
             vueTsc: true, // vue typescript type check
             eslint: {
-                lintCommand: 'eslint ./src --ext .vue,.js,.jsx,.cjs,.ts --fix',
+                lintCommand: 'eslint ./src --ext .vue,.js,.jsx,.cjs,.ts',
             },
         }),
     ],
-    server: {
-        host: '0.0.0.0',
-    },
+    // server: { // only use for development server
+    //     host: '0.0.0.0',
+    // },
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
-    esbuild: {
-        // drop: ['console', 'debugger'],
-        pure: ['console.log'],
-    },
+    // esbuild: {   // use to filter console
+    //     // drop: ['console', 'debugger'],
+    //     // pure: ['console.log'],
+    // },
     build: {
         // target: ['modules'],
         // minify: 'esbuild',             // default use esbuild. approx 40x faster than terser
         // assetsDir: '../webroot/img',
-        sourcemap: true, // please add source map to svn ignore
         assetsInlineLimit: 4096,
-        outDir: '../Plugin/Tms/webroot/vuejs/src/',
+        outDir: '[your path]',
         emptyOutDir: true,
-        // cssCodeSplit: false,  // wether include in js file or use a single css file. format 'umd' default to include in js file when cssCodeSplit set to true or not set
+        sourcemap: true, // please add source map to svn ignore
+        // cssCodeSplit: false, // wether include in js file or use a single css file. format 'umd' default to include in js file when cssCodeSplit set to true or not set
         /**
-         *  lib mode aim to create js library. may create slightly larger file.
+         *  lib mode aim to create js library. may create larger file.
          * */
         // lib: {
         //   entry: resolve(__dirname, 'src/main.ts'),
@@ -64,16 +64,14 @@ export default defineConfig({
         //     * */
         //   formats: [ /*"es",*/  "umd"],
         // },
+        manifest: true,
         rollupOptions: {
             // external: ['pinia'], // any external library you do not want to include add to here
             input: resolve(__dirname, 'src/main.ts'),
             output: {
-                entryFileNames: 'entry.umd.js',
+                // entryFileNames: 'entry.umd.js',
                 // assetFileNames: 'style.css',
                 format: 'umd',
-                // file: 'entry.js',
-                // name: 'entry.js',
-                // dir: './dist/',
             },
         },
     },

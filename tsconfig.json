@@ -13,7 +13,6 @@
       "dom.iterable",
       "es2022"
     ],
-    "sourceMap": true,
     "ignoreDeprecations": "5.0",
     "noImplicitAny": true,
   },

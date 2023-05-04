@@ -1,7 +1,7 @@
-# vue-dynamic-mount
+# Guide To Use Vue.js in Currently CakePHP project
 ### vue version @3.2.45
 
-This project is aim to `dynamically mounting vue.js view/component to anywhere` in the cakephp generated HTML tempalte by simply inserting a `.ctp` component as entry point. As there is only minimal configuration in PHP side, you can use it in other kind of server side old project.
+This project is aim to `dynamically mounting vue.js view/component to anywhere` in the php generated HTML tempalte by simply inserting a `.ctp` component as entry point. As there is only minimal configuration in PHP side, you can use it in other kind of server side old project.
 
 This project use:
 - Vue.js 3.2 (Composition API)
@@ -26,16 +26,7 @@ To enforce code style and reduce error, project is configured with ESlint and Pr
 <br>
 
 ## To Start with
-To start, run `npm i` / `yarn` to install required depenencies.To start development, run `npm run dev` / `yarn dev`. It will start the rollup file-watching function and rebuild the project on save. You can also manually build by `npm run build` / `yarn build`. The javascript source will be bundled into a single `entry.umd.js`, and scoped css will be bundled into `style.css`. create minified js file and copy to the webroot path automatically on file change. Run `npm run build` or `yarn build` for building only.
-
-Current build time and bundle size for 30kb project + 120kb vue.js main dependency :
-```
-build started...
-✓ 4 modules transformed.
-../webroot/js/vuejs/src/style.css      10.94 kB │ gzip:  3.06 kB
-../webroot/js/vuejs/src/entry.umd.js  130.64 kB │ gzip: 49.11 kB
-built in 633ms.
-```
+To start, run `npm i` / `yarn` to install required depenencies.To start development, run `npm run dev` / `yarn dev`. It will start the rollup file-watching function and rebuild the project on save. You can also manually build by `npm run build` / `yarn build`. The javascript source will be bundled into a single `main-[hash].js`, and scoped css will be bundled into the file. create minified js file and copy to the webroot path automatically on file change. Run `npm run build` or `yarn build` for building only.
 
 <br>
 
@@ -49,45 +40,58 @@ To use vue.js in the project, you have to use ctp file to serve as an entry poin
 
 ```php
 echo $this->element('vue_component',[
+    'view' => 'viewName',
     // data to be pass as props
     'data' => $data,
     // pass necessary translation
     'translation' => [
-        'some_translate' => __d('tms', 'some_translate')
+        'some_translate'    // only need key
     ],
     'config' => [
         'baseUrl' => $this->HTML->url($langPath),
         'langKey' => $langKey,
         'customStyle' => $customStyle,
     ],
+    
     //not necessary. will random generate a unique selector if not provided.
     'selector' => $someUniqueSelector, 
-    'view' => 'viewName'
 ]);
 ```
 
-The `vue_component.ctp` will include essential files
-- `webroot/js/vuejs/src/entry.umd.js` 
-- `webroot/js/vuejs/src/style.css`
+The `vue_component.ctp` will include essential file
+- `[your path]/asset/main-[hash].js` 
 
-The `entry.umd.js` is a single umd js file of the compiled version of your vue.js project. It will be genereated automatically on save.\
-To use other production build, change the config in vite.config.ts.
+The `main-[hash].js` is a single file of the compiled version of your vue.js project. It will be genereated automatically on save.\
+The hash name can be got by reading `manifest.json`.
 
 ```php
-$this->Html->script('/js/vuejs/src/entry.umd.js', false);
-$this->Html->css('/js/vuejs/src/style.css', ['inline' => false]);
+if (file_exists('[your path]/manifest.json')) {
+    $manifest = file_get_contents('[your path]/manifest.json'); // read the filename from manifest
+    $manifest = json_decode($manifest, true);
+    $filename = $manifest['src/main.ts']['file'];
+    $this->Html->script('[your path]'.$filename, false);
+}
 ```
 
 After adding essential files to html head, The `vue_component.ctp` will assign the necessary props passed by server to a function called `initVue`, and start mouting the vue.js view.
 
+```php
+$initProps = [
+    'data' => $data,
+    'translation' => $translation,
+    'config' => $config,
+    'view' => $view,
+    'selector' => '#'.$uniqSelector,
+];
+```
+
 ```js
 
-  window.initVue && window.initVue({
-    data: JSON.parse('<?php echo json_encode($data); ?>'),
-    translation: JSON.parse('<?php echo json_encode($translation); ?>'),
-    view: '<?php echo $view; ?>',
-    selector: '#<?php echo $uniqSelector; ?>'
-  });
+try {
+    window.initVue && window.initVue(JSON.parse('<?php echo json_encode($initProps); ?>'));
+} catch (error) {
+    console.warn(error);
+}
 
 ```
 

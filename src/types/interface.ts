@@ -2,7 +2,7 @@ import type { IconName } from '@/components/IconButton.vue'
 
 declare global {
     interface Window {
-        initVue: Function
+        initVue: Function | PhpProps[]
     }
 }
 

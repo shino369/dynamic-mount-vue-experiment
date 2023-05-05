@@ -4,7 +4,7 @@ import { defineAsyncComponent, ref, watch } from 'vue'
 // import ModalDialog from '@/components/ModalDialog.vue'
 import { viewPropsStore } from '@/stores/viewProps'
 import ErrorBoundary from '@/components/ErrorBoundary.vue'
-import ExtraPreferenceView from '@/views/ExtraPreferenceView.vue'
+// import ExtraPreferenceView from '@/views/ExtraPreferenceView.vue'
 // import ExampleView from './views/ExampleView.vue'
 import { useStorageStore } from '@/stores/storage'
 
@@ -22,8 +22,8 @@ const viewMap = new Map([
     ],
     [
         'ExtraPreferenceView',
-        // defineAsyncComponent(() => import('@/views/ExtraPreferenceView.vue')),
-        ExtraPreferenceView,
+        defineAsyncComponent(() => import('@/views/ExtraPreferenceView.vue')),
+        // ExtraPreferenceView,
     ],
 ])
 

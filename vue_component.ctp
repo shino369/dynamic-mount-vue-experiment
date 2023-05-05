@@ -21,11 +21,8 @@ $config['langKey'] = isset($langKey) ? $langKey : 1;
 $config['baseUrl'] = isset($langPath) ? $this->Html->url($langPath) : '';
 
 /*
-No idea how to use es module with async component here. Some internal module cannot resolve path correctly.
-A lot of weird bugs occur.
 
-if anyone able to do so please teach me :[
-the following is a edited html helper that load esm module js, simply copy from original one:
+the following class is a edited html helper that load esm module js, simply copy from original one:
 
 App::uses('AppHelper', 'View/Helper');
 
@@ -83,23 +80,38 @@ class JSModuleHelper extends AppHelper {
 
 */
 
-if (file_exists('[your path]/manifest.json')) {
-    $manifest = file_get_contents('[your path]/manifest.json'); // read the filename from manifest
+// change to other format, e.g. esm, for other build format
+// available: esm | umd
+$format = 'esm';
+// modify all path by yourself
+$rootPath = "../Plugin/[plugin name]/webroot/vuejs/$format/manifest.json";
+
+if (file_exists($rootPath)) {
+	// read the filename from manifest
+    $manifest = file_get_contents($rootPath);
     $manifest = json_decode($manifest, true);
-    $filename = $manifest['src/main.ts']['file'];
-    $this->Html->script('[your path]'.$filename, false);
+    $filename = $manifest["src/main_$format.ts"]["file"];
 
-    // // for esm module
-    // $this->JSModule->script('[your path]'.$filename, false);
+	if ($format == 'umd') {
+		// for umd
+    	$this->Html->script('/[plugin name]/vuejs/'.$format.'/'.$filename, false);
+	}
 
-    // // if separate css
-    // $styleName = $manifest['style.css']['file'];
-    // $this->Html->css('[your path]'.$styleName, null, array('inline'=>false, 'once' => true));
+	if ($format == 'esm') {
+		// for esm module (still under development)
+		$this->JSModule->script("/[plugin name]/vuejs/$format/$filename", false);
+	}
+
+	if (isset($manifest['style.css'])) {
+		// if separate css
+		$styleName = $manifest['style.css']['file'];
+		$this->Html->css("/[plugin name]/vuejs/$format/$styleName", null, array('inline'=>false, 'once' => true));
+	}
 }
 
 $jsonReturnMap = [];
 foreach ($translation as $key) {
-    $trans = __d('some_plugin', $key);
+    $trans = __d('[plugin name]', $key);
     if ($trans == $key) {
         $trans =  __($key);
     }
@@ -122,26 +134,30 @@ $initProps = [
     'selector' => '#'.$uniqSelector,
 ];
 
-
-/*
-
-to load module:
-const load = window.onload;
-window.onload = () => {
-    load && load();
-    window.initVue && window.initVue(JSON.parse('<?php echo json_encode($initProps); ?>'));
-}
-
-*/
-
 ?>
 
 <div id="<?php echo $uniqSelector; ?>"></div>
 
+<div id="<?php echo $uniqSelector.'_script'; ?>">
 <script>
 try {
-    window.initVue && window.initVue(JSON.parse('<?php echo json_encode($initProps); ?>'));
+	const format = '<?php echo $format; ?>';
+	const props = JSON.parse('<?php echo json_encode($initProps); ?>');
+	switch (format) {
+		case 'umd':
+			window.initVue && window.initVue(props);
+			break;
+		case 'esm':
+			window.initVue = window.initVue || [];
+			window.initVue.push(props);
+			break;
+	}
+
+	// remove this script block after props loaded
+	document.querySelector(props.selector + '_script').remove()
+
 } catch (error) {
     console.warn(error);
 }
 </script>
+</div>

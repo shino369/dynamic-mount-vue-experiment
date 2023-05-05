@@ -26,7 +26,11 @@ To enforce code style and reduce error, project is configured with ESlint and Pr
 <br>
 
 ## To Start with
-To start, run `npm i` / `yarn` to install required depenencies.To start development, run `npm run dev` / `yarn dev`. It will start the rollup file-watching function and rebuild the project on save. You can also manually build by `npm run build` / `yarn build`. The javascript source will be bundled into a single `main-[hash].js`, and scoped css will be bundled into the file. create minified js file and copy to the webroot path automatically on file change. Run `npm run build` or `yarn build` for building only.
+To start, run `npm i` / `yarn` to install required depenencies.To start development, run `npm run dev` / `yarn dev`. It will start the rollup file-watching function and rebuild the project on save. You can also manually build by `npm run build` / `yarn build`. The javascript source will be bundled into a single `main_umd-[hash].js` if using umd build, and scoped css will also be bundled into the file. Esm build is still under testing, not recommend to use it.
+
+The created minified js file will be located in your webroot path automatically.
+
+To change build format `(umd/esm)`, config the variable `VITE_FORMAT` in .env. For esm build, asset path if neccessary. Config  `VITE_BASE` in .env to change it to your server base url.
 
 <br>
 
@@ -59,21 +63,44 @@ echo $this->element('vue_component',[
 ```
 
 The `vue_component.ctp` will include essential file
-- `[your path]/asset/main-[hash].js` 
+- `Tms/webroot/js/vuejs/[format]/asset/main_[format]-[hash].js` 
+- `Tms/webroot/js/vuejs/[format]/asset/style.css` (if using esm format)
+- `Tms/webroot/js/vuejs/[format]/manifest.json` 
 
-The `main-[hash].js` is a single file of the compiled version of your vue.js project. It will be genereated automatically on save.\
+Files will be genereated automatically on save.\
 The hash name can be got by reading `manifest.json`.
 
 ```php
-if (file_exists('[your path]/manifest.json')) {
-    $manifest = file_get_contents('[your path]/manifest.json'); // read the filename from manifest
+// change to other format, e.g. esm, for other build format.
+// available: esm | umd
+$format = 'esm';
+$rootPath = "../Plugin/Tms/webroot/vuejs/$format/manifest.json";
+
+if (file_exists($rootPath)) {
+	// read the filename from manifest
+    $manifest = file_get_contents($rootPath);
     $manifest = json_decode($manifest, true);
-    $filename = $manifest['src/main.ts']['file'];
-    $this->Html->script('[your path]'.$filename, false);
+    $filename = $manifest["src/main_$format.ts"]["file"];
+
+	if ($format == 'umd') {
+		// for umd
+    	$this->Html->script('/tms/vuejs/'.$format.'/'.$filename, false);
+	}
+
+	if ($format == 'esm') {
+		// for esm module (still under development)
+		$this->JSModule->script("/tms/vuejs/$format/$filename", false);
+	}
+
+	if (isset($manifest['style.css'])) {
+		// if separate css
+		$styleName = $manifest['style.css']['file'];
+		$this->Html->css("/tms/vuejs/$format/$styleName", null, array('inline'=>false, 'once' => true));
+	}
 }
 ```
 
-After adding essential files to html head, The `vue_component.ctp` will assign the necessary props passed by server to a function called `initVue`, and start mouting the vue.js view.
+After adding essential files to html head, The `vue_component.ctp` will assign the necessary props passed by server to a function called `initVue` (if umd) or push to `initVue` as window var, and start mouting the vue.js view.
 
 ```php
 $initProps = [
@@ -85,13 +112,31 @@ $initProps = [
 ];
 ```
 
-```js
+```html
 
+<div id="<?php echo $uniqSelector.'_script'; ?>">
+<script>
 try {
-    window.initVue && window.initVue(JSON.parse('<?php echo json_encode($initProps); ?>'));
+	const format = '<?php echo $format; ?>';
+	const props = JSON.parse('<?php echo json_encode($initProps); ?>');
+	switch (format) {
+		case 'umd':
+			window.initVue && window.initVue(props);
+			break;
+		case 'esm':
+			window.initVue = window.initVue || [];
+			window.initVue.push(props);
+			break;
+	}
+
+	// remove this script block after props loaded
+	document.querySelector(props.selector + '_script').remove()
+
 } catch (error) {
     console.warn(error);
 }
+</script>
+</div>
 
 ```
 

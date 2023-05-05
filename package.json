@@ -15,6 +15,7 @@
     "nodemon": "nodemon -e js,ts,vue --watch src --exec \"yarn build\""
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
     "pinia": "^2.0.28",
     "vue": "^3.2.45"
   },

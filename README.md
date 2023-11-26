@@ -1,4 +1,4 @@
-# Guide To Use Vue.js in Currently CakePHP project
+# Guide To Use Vue.js in Current CakePHP project
 ### vue version @3.2.45
 
 This project is aim to `dynamically mounting vue.js view/component to anywhere` in the php generated HTML tempalte by simply inserting a `.ctp` component as entry point. As there is only minimal configuration in PHP side, you can use it in other kind of server side old project.
